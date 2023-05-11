@@ -38,6 +38,8 @@ int output(const Neutrals &neutrals,
   int nOutputs = args.get_n_outputs();
   static std::vector<OutputContainer> AllOutputContainers;
 
+    std::string temp = "ghi";
+    
   if (IsFirstTime) {
     // Initialize all of the output containers for all of the output
     // types requested
@@ -50,11 +52,14 @@ int output(const Neutrals &neutrals,
       AllOutputContainers.push_back(DummyOutputContainer);
 
     IsFirstTime = false;
+      
+      temp = "abc";
   }
 
-  report.student_checker_function_name(args.get_is_student(),
-				       args.get_student_name(),
-				       3, "");
+//  report.student_checker_function_name(args.get_is_student(),
+//				       args.get_student_name(),
+//				       3, "");
+    std::cout << "> (3) What function is this " << args.get_student_name() << "? Found it: " << temp << "\n";
   
   for (int iOutput = 0; iOutput < nOutputs; iOutput++) {
 
