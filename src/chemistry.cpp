@@ -3,10 +3,13 @@
 
 #include <string>
 #include <fstream>
+#include <unordered_map>
 #include <vector>
 #include <iostream>
 
 #include "aether.h"
+
+using hashtable = std::unordered_map<std::pair<std::string, int>> headers;
 
 // -----------------------------------------------------------------------------
 // Initialize chemistry class
@@ -65,18 +68,21 @@ int Chemistry::read_chemistry_file(Neutrals neutrals,
       else {
 
         nReactions = 0;
+        
+        // Hash Map storing headers
+        hashtable headers;
+        for(int i = 0; i < csv[0].size(); ++i)
+            headers[csv[0][i]] = i;
 
         // Skip 2 lines of headers!
         for (int iLine = 2; iLine < nLines; iLine++) {
           // Some final rows can have comments in them, so we want to
           // skip anything where the length of the string in column 2
           // is == 0:
-          if (csv[iLine][7].length() > 0) {
-            report.print(3, "interpreting chemistry line : " + csv[iLine][0]);
+          if (csv[iLine][headers["rate"]].length() > 0) {
+            report.print(3, "interpreting chemistry line : " + csv[iLine][headers["loss1"]]);
             reaction = interpret_reaction_line(neutrals, ions,
                                                csv[iLine], report);
-
-
           }
 
           // check if it is part of a piecewise function,
@@ -124,7 +130,8 @@ int Chemistry::read_chemistry_file(Neutrals neutrals,
 Chemistry::reaction_type Chemistry::interpret_reaction_line(Neutrals neutrals,
                                                             Ions ions,
                                                             std::vector<std::string> line,
-                                                            Report &report) {
+                                                            Report &report,
+                                                            hashtable &headers) {
 
   std::string function = "Chemistry::interpret_reaction_line";
   static int iFunction = -1;
@@ -139,7 +146,7 @@ Chemistry::reaction_type Chemistry::interpret_reaction_line(Neutrals neutrals,
   // Losses (left side) first:
   reaction.nLosses = 0;
 
-  for (i = 0; i < 3; i++) {
+  for (i = headers["loss1"]; i <= headers["loss3"]; i++) {
     find_species_id(line[i], neutrals, ions, id_, IsNeutral, report);
 
     if (id_ >= 0) {
@@ -153,7 +160,7 @@ Chemistry::reaction_type Chemistry::interpret_reaction_line(Neutrals neutrals,
   // Sources (right side) second:
   reaction.nSources = 0;
 
-  for (i = 4; i < 7; i++) {
+  for (i = headers["source1"]; i <= headers["source3"]; i++) {
     find_species_id(line[i], neutrals, ions, id_, IsNeutral, report);
 
     if (id_ >= 0) {
@@ -165,22 +172,19 @@ Chemistry::reaction_type Chemistry::interpret_reaction_line(Neutrals neutrals,
   }
 
   // Reaction Rate:
-  reaction.rate = stof(line[7]);
-
-  // for base, this is 8, for richards, this is 10:
-  int iBranch_ = 10;
+  reaction.rate = stof(line[headers["rate"]]);
 
   // Branching Ratio:
-  if (line[iBranch_].length() > 0)
-    reaction.branching_ratio = stof(line[iBranch_]);
+  if (line[headers["branching"]].length() > 0)
+    reaction.branching_ratio = stof(line[headers["branching"]]);
 
   else
     reaction.branching_ratio = 1;
 
 
   // energy released as exo-thermic reaction:
-  if (line[iBranch_ + 1].length() > 0)
-    reaction.energy = stof(line[iBranch_ + 1]);
+  if (line[headers["heat"]].length() > 0)
+    reaction.energy = stof(line[headers["heat"]]);
 
   else
     reaction.energy = 0;
@@ -191,32 +195,30 @@ Chemistry::reaction_type Chemistry::interpret_reaction_line(Neutrals neutrals,
   reaction.type = 0;
 
   // if richards, check for temperature dependence
-  if (iBranch_ = 10) {
-    int iNumerator = 17; // first column of temperature dependence variables
-
+  if (headers["branching"] = 10) {
     //std::cout << line[17] << ", " << line[18] << ", " << line[19] << "\n";
-    if (line[iNumerator].length() > 0) {
-      reaction.numerator =  stof(line[iNumerator]);
-      reaction.denominator =     line[iNumerator + 1];
+    if (line[headers["Numerator"]].length() > 0) {
+      reaction.numerator = stof(line[headers["Numerator"]]);
+      reaction.denominator =    line[headers["Denominator"]];
 
-      if (line[iNumerator + 2].length() > 0)
-        reaction.exponent = stof(line[iNumerator + 2]);
+      if (line[headers["Exponent"]].length() > 0)
+        reaction.exponent = stof(line[headers["Exponent"]]);
     } else {
       // default to 0 (calc_chemical_sources will use constant rate)
       reaction.type = 0;
     }
 
-    reaction.piecewiseVar =      line[iNumerator + 3];
+    reaction.piecewiseVar =      line[headers["Piecewise"]];
 
     //std::cout << line[10] << ", " << line[17] << ", " << line[17+4] << "\n";
-    if (line[iNumerator + 4].length() > 0)
-      reaction.min =        stoi(line[iNumerator + 4]);
+    if (line[headers["Min"]].length() > 0)
+      reaction.min =        stoi(line[headers["Min"]);
 
-    if (line[iNumerator + 5].length() > 0)
-      reaction.max =        stoi(line[iNumerator + 5]);
+    if (line[headers["Max"].length() > 0)
+      reaction.max =        stoi(line[headers["Max"]);
 
-    if (line[iNumerator + 6].length() > 0)
-      reaction.type =       stoi(line[iNumerator + 6]);
+    if (line[headers["Formula Type"].length() > 0)
+      reaction.type =       stoi(line[headers["Formula Type"]]);
   }
 
   report.exit(function);
