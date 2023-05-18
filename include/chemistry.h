@@ -7,6 +7,8 @@
 #include <vector>
 #include <string>
 
+using hashtable = std::unordered_map<std::pair<std::string, int>> headers;
+
 /**************************************************************
  * \class Chemistry
  *
@@ -117,7 +119,8 @@ class Chemistry {
   reaction_type interpret_reaction_line(Neutrals neutrals,
                                         Ions ions,
                                         std::vector<std::string> line,
-                                        Report &report);
+                                        Report &report,
+                                        hashtable &headers);
 
   void find_species_id(std::string name,
                        Neutrals neutrals,
