@@ -9,7 +9,7 @@
 
 #include "aether.h"
 
-using hashtable = std::unordered_map<std::pair<std::string, int>> headers;
+using hashtable = std::unordered_map<std::string, int>;
 
 // -----------------------------------------------------------------------------
 // Initialize chemistry class
