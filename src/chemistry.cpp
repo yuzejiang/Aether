@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <vector>
 #include <iostream>
+#include <random>
 
 #include "aether.h"
 
@@ -113,6 +114,39 @@ int Chemistry::read_chemistry_file(Neutrals neutrals,
 
             reactions.push_back(reaction);
             nReactions++;
+          }
+        }
+          
+        // add perturb to the all the reaction lines
+        if(headers.find("perturb") != headers.end()) {
+          json values = args.get_perturb_values();
+            if(values.size() > 0) {
+              if(values[0] == "all") {
+                for(int i = 0; i < reactions.size(); ++i) {
+                  precision_t perturb_rate = stoi(csv[i+2][headers["perturb"]]);
+                  precision_t stdv = 0;
+                  if(perturb_rate.length() > 0)
+                      precision_t stdv = perturb_rate * reactions[i].rate;
+                  std::random_device rd {};
+                  std::mt19937 gen {rd()};
+                  std::normal_distribution<> d {reactions[i], stdv};
+                  reactions[i].rate = d(gen);
+                }
+              }
+              else {
+                for(auto &i : values) {
+                  int line = stoi(i.substr(1));
+                  precision_t perturb_rate = stoi(csv[i+2][headers["perturb"]]);
+                  precision_t stdv = 0;
+                  if(perturb_rate.length() > 0)
+                    precision_t stdv = perturb_rate * reactions[i].rate;
+                  std::random_device rd {};
+                  std::mt19937 gen {rd()};
+                  std::normal_distribution<> d {reactions[i], stdv};
+                  reactions[i].rate = d(gen);
+                }
+              }
+            }
           }
         }
       }
