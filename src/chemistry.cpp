@@ -117,11 +117,11 @@ int Chemistry::read_chemistry_file(Neutrals neutrals,
         }
           
         // add perturb to the all the reaction lines
-        if(headers.find("perturb") != headers.end()) {
-          // TODO: this function might not work as expected to get the lines that need to be perturbed. 
+        if(headers.find("uncertainty") != headers.end()) {
           json values = args.get_perturb_values();
-          if(values.size() > 0) {
-            if(values[0] == "all") {
+          json chemistryList = values["Chemistry"];
+          if(chemistryList.size() > 0) {
+            if(chemistryList[0] == "all") {
               for(int i = 0; i < reactions.size(); ++i) {
                 precision_t perturb_rate = stoi(csv[i+2][headers["uncertainty"]]);
                 if(perturb_rate.length() > 0)
@@ -129,7 +129,7 @@ int Chemistry::read_chemistry_file(Neutrals neutrals,
               }
             }
             else {
-              for(auto &i : values) {
+              for(auto &i : chemistryList) {
                 int line = stoi(i.substr(1));
                 precision_t perturb_rate = stoi(csv[i+2][headers["uncertainty"]]);
                 if(perturb_rate.length() > 0)
