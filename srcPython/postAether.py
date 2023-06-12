@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.cm as cm
 from netCDF4 import Dataset
+import h5py
 import argparse
 import os
 import json
