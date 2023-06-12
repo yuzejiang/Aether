@@ -32,7 +32,7 @@ aether.json file. As an example:
 		   "Std" : 2.0,
 		   "Add" : true,
 		   "Constant" : false}
-
+    "Chemistry" : ["R01", "R02", "R33"]
     }
 
 This perturbs the F10.7, F10.7a, and IMF Bz indices.  The sub-parts of
