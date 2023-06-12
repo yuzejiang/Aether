@@ -83,6 +83,18 @@ int Chemistry::read_chemistry_file(Neutrals neutrals,
             report.print(3, "interpreting chemistry line : " + csv[iLine][headers["loss1"]]);
             reaction = interpret_reaction_line(neutrals, ions,
                                                csv[iLine], report);
+              
+            // add perturb
+            if(csv[iLine][headers["uncertainty"]].length() > 0) {
+              json values = args.get_perturb_values();
+              json chemistryList = values["Chemistry"];
+              if(chemistryList.size() > 0) {
+                if(chemistryList[0] == "all" || chemistryList.find(reaction.name) != chemistryList.end()) {
+                  precision_t perturb_rate = stoi(csv[i+2][headers["uncertainty"]]);
+                  reaction.rate *= perturb_rate;
+                }
+              }
+            }
           }
 
           // check if it is part of a piecewise function,
@@ -113,29 +125,6 @@ int Chemistry::read_chemistry_file(Neutrals neutrals,
 
             reactions.push_back(reaction);
             nReactions++;
-          }
-        }
-          
-        // add perturb to the all the reaction lines
-        if(headers.find("uncertainty") != headers.end()) {
-          json values = args.get_perturb_values();
-          json chemistryList = values["Chemistry"];
-          if(chemistryList.size() > 0) {
-            if(chemistryList[0] == "all") {
-              for(int i = 0; i < reactions.size(); ++i) {
-                precision_t perturb_rate = stoi(csv[i+2][headers["uncertainty"]]);
-                if(perturb_rate.length() > 0)
-                  reactions[i].rate *= perturb_rate;
-              }
-            }
-            else {
-              for(auto &i : chemistryList) {
-                int line = stoi(i.substr(1));
-                precision_t perturb_rate = stoi(csv[i+2][headers["uncertainty"]]);
-                if(perturb_rate.length() > 0)
-                  reactions[i].rate *= perturb_rate;
-              }
-            }
           }
         }
       }
