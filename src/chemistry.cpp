@@ -60,7 +60,7 @@ int Chemistry::read_chemistry_file(Neutrals neutrals,
 
       std::vector<std::vector<std::string>> csv = read_csv(infile_ptr);
 
-      int nLines = csv.size();
+      int nLines = (int)(csv.size());
 
       if (nLines <= 2)
         iErr = 1;
@@ -82,7 +82,7 @@ int Chemistry::read_chemistry_file(Neutrals neutrals,
           if (csv[iLine][headers["rate"]].length() > 0) {
             report.print(3, "interpreting chemistry line : " + csv[iLine][headers["loss1"]]);
             reaction = interpret_reaction_line(neutrals, ions,
-                                               csv[iLine], report， headers);
+                                               csv[iLine], report, headers);
               
             // add perturb
             if(csv[iLine][headers["uncertainty"]].length() > 0) {
@@ -90,7 +90,7 @@ int Chemistry::read_chemistry_file(Neutrals neutrals,
               json chemistryList = values["Chemistry"];
               if(chemistryList.size() > 0) {
                 if(chemistryList[0] == "all" || chemistryList.find(reaction.name) != chemistryList.end()) {
-                  precision_t perturb_rate = stoi(csv[i+2][headers["uncertainty"]]);
+                  precision_t perturb_rate = stoi(csv[iLine][headers["uncertainty"]]);
                   reaction.rate *= perturb_rate;
                 }
               }
@@ -207,7 +207,7 @@ Chemistry::reaction_type Chemistry::interpret_reaction_line(Neutrals neutrals,
   reaction.type = 0;
 
   // if richards, check for temperature dependence
-  if (headers["branching"] = 10) {
+  if (headers["branching"] == 10) {
     //std::cout << line[17] << ", " << line[18] << ", " << line[19] << "\n";
     if (line[headers["Numerator"]].length() > 0) {
       reaction.numerator = stof(line[headers["Numerator"]]);
@@ -224,12 +224,12 @@ Chemistry::reaction_type Chemistry::interpret_reaction_line(Neutrals neutrals,
 
     //std::cout << line[10] << ", " << line[17] << ", " << line[17+4] << "\n";
     if (line[headers["Min"]].length() > 0)
-      reaction.min =        stoi(line[headers["Min"]);
+      reaction.min =        stoi(line[headers["Min"]]);
 
-    if (line[headers["Max"].length() > 0)
-      reaction.max =        stoi(line[headers["Max"]);
+    if (line[headers["Max"]].length() > 0)
+      reaction.max =        stoi(line[headers["Max"]]);
 
-    if (line[headers["Formula Type"].length() > 0)
+    if (line[headers["Formula Type"]].length() > 0)
       reaction.type =       stoi(line[headers["Formula Type"]]);
   }
 
