@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 
-using hashtable = std::unordered_map<std::pair<std::string, int>> headers;
+using hashtable = std::unordered_map<std::string, int>;
 
 /**************************************************************
  * \class Chemistry
@@ -73,6 +73,8 @@ class Chemistry {
     int max;
     /// type of formula to use for reaction rate:
     int type;
+    /// name of the reaction
+    std::string name;
   };
 
   /// vector to keep track of all reactions:
