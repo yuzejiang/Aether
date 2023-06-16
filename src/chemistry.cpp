@@ -71,8 +71,8 @@ int Chemistry::read_chemistry_file(Neutrals neutrals,
         
         // Hash Map storing headers
         hashtable headers;
-        for(int i = 0; i < csv[0].size(); ++i)
-            headers[csv[0][i]] = i;
+        for(int x = 0; x < csv[0].size(); ++x)
+            headers[csv[0][x]] = x;
 
         // Skip 2 lines of headers!
         for (int iLine = 2; iLine < nLines; iLine++) {
@@ -82,7 +82,7 @@ int Chemistry::read_chemistry_file(Neutrals neutrals,
           if (csv[iLine][headers["rate"]].length() > 0) {
             report.print(3, "interpreting chemistry line : " + csv[iLine][headers["loss1"]]);
             reaction = interpret_reaction_line(neutrals, ions,
-                                               csv[iLine], report);
+                                               csv[iLine], report， headers);
               
             // add perturb
             if(csv[iLine][headers["uncertainty"]].length() > 0) {
