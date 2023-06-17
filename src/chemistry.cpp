@@ -186,6 +186,9 @@ Chemistry::reaction_type Chemistry::interpret_reaction_line(Neutrals neutrals,
   // Reaction Rate:
   reaction.rate = stof(line[headers["rate"]]);
 
+  // Reaction Name:
+  reaction.name = line[headers["name"]];
+
   // Branching Ratio:
   if (line[headers["branching"]].length() > 0)
     reaction.branching_ratio = stof(line[headers["branching"]]);
