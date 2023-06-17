@@ -210,7 +210,7 @@ Chemistry::reaction_type Chemistry::interpret_reaction_line(Neutrals neutrals,
   reaction.type = 0;
 
   // if richards, check for temperature dependence
-  if (headers["branching"] == 10) {
+  if (headers["branching"] == 11) {
     //std::cout << line[17] << ", " << line[18] << ", " << line[19] << "\n";
     if (line[headers["Numerator"]].length() > 0) {
       reaction.numerator = stof(line[headers["Numerator"]]);
