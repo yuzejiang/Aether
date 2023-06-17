@@ -91,7 +91,7 @@ int Chemistry::read_chemistry_file(Neutrals neutrals,
               if(chemistryList.size() > 0) {
                 if(chemistryList[0] == "all" || chemistryList.find(reaction.name) != chemistryList.end()) {
                   precision_t perturb_rate = stoi(csv[iLine][headers["uncertainty"]]);
-                  reaction.rate *= perturb_rate;
+                  reaction.rate *= (1.0+perturb_rate);
                 }
               }
             }
